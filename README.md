@@ -4,6 +4,9 @@
 
 A single-page interactive tool for presenting your professional skills and exploring project fit — in real time, with whoever you're talking to.
 
+![Dark mode](screenshots/darkmode.png)
+![Light mode](screenshots/lightmode.png)
+
 ---
 
 ## What it's for

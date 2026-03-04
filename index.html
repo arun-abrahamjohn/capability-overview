@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capability Overview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* =====================================================
+       DESIGN TOKENS
+       ===================================================== */
+    :root {
+      --bg: #080C10;
+      --surface: #0D1218;
+      --surface2: #121A22;
+      --border: #1E2D3A;
+      --accent: #3ECFB2;
+      --accent2: #7B9EFF;
+      --text: #E8EDF2;
+      --muted: #5A7280;
+      --highlight-bg: #0F1A1E;
+      --highlight-border: #2A4A44;
+      --intro-color: #8AAFC0;
+      --result-body-color: #6B9BB8;
+    }
+
+    [data-theme="light"] {
+      --bg: #FAF7FF;
+      --surface: #FFFFFF;
+      --surface2: #F3EEF9;
+      --border: #E2D6F0;
+      --accent: #C026A0;
+      --accent2: #7C3AED;
+      --text: #1A0A2E;
+      --muted: #9B85B8;
+      --highlight-bg: #FDF4FF;
+      --highlight-border: #E8C8F0;
+      --intro-color: #6B4E8A;
+      --result-body-color: #6B4E8A;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 48px 32px;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* =====================================================
+       BACKGROUND DECORATIVE
+       ===================================================== */
+    .bg-grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.5;
+      z-index: 0;
+    }
+
+    .bg-blobs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+    }
+
+    /* =====================================================
+       LAYOUT
+       ===================================================== */
+    .container {
+      width: 1040px;
+      max-width: 100%;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 56px;
+    }
+
+    .page-title { font-size: 24px; font-weight: 600; }
+
+    .role-tag {
+      font-size: 12px;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-icon {
+      width: 18px;
+      height: 18px;
+      color: var(--muted);
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    .toggle-icon.active {
+      color: var(--accent);
+      opacity: 1;
+    }
+
+    .toggle-track {
+      width: 40px;
+      height: 22px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      position: relative;
+      transition: border-color 0.25s;
+      flex-shrink: 0;
+    }
+
+    [data-theme="light"] .toggle-track { border-color: var(--accent); }
+
+    .toggle-thumb {
+      width: 16px;
+      height: 16px;
+      background: var(--muted);
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s;
+    }
+
+    [data-theme="light"] .toggle-thumb {
+      transform: translateX(18px);
+      background: var(--accent);
+    }
+
+    /* =====================================================
+       API KEY BANNER
+       ===================================================== */
+    .api-key-banner {
+      background: var(--surface);
+      border: 1px solid var(--accent2);
+      border-radius: 14px;
+      padding: 14px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .api-key-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent2);
+      white-space: nowrap;
+    }
+
+    .api-key-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 0;
+    }
+
+    .api-key-input:focus { border-color: var(--accent2); }
+
+    .api-key-save {
+      padding: 8px 16px;
+      background: var(--accent);
+      color: #080C10;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .api-key-save:hover { opacity: 0.85; }
+
+    /* =====================================================
+       SETUP BANNER
+       ===================================================== */
+    .setup-banner {
+      background: var(--surface);
+      border: 1px solid var(--accent2);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 36px;
+    }
+
+    .setup-banner-title {
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent2);
+      margin-bottom: 16px;
+    }
+
+    .setup-steps { display: flex; flex-direction: column; gap: 12px; }
+
+    .setup-step { display: flex; align-items: flex-start; gap: 12px; }
+
+    .step-badge {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      background: var(--surface2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+
+    .step-text { font-size: 13px; color: var(--muted); line-height: 1.6; padding-top: 2px; }
+
+    /* =====================================================
+       INTRO SECTION
+       ===================================================== */
+    .intro-section {
+      margin-bottom: 36px;
+      max-width: 680px;
+    }
+
+    .intro-paragraph {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--intro-color);
+      border-left: 2px solid var(--accent);
+      padding-left: 16px;
+      min-height: 1.8em;
+    }
+
+    .pulse-text {
+      font-size: 13px;
+      color: var(--muted);
+      animation: labelPulse 4s ease-in-out infinite;
+    }
+
+    /* =====================================================
+       CHIPS SECTION
+       ===================================================== */
+    .chips-section { margin-bottom: 40px; }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .chips-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .chips-empty {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    /* Chips — outer width never changes on hover */
+    .chip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      font-family: inherit;
+      color: var(--text);
+      overflow: hidden;
+      /* Width is set naturally; overflow:hidden prevents expansion */
+    }
+
+    .chip:hover { border-color: var(--muted); background: var(--surface2); }
+
+    .chip-inner {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+      overflow: hidden;
+      transition: max-width 0.2s ease;
+    }
+
+    /* On hover, inner shrinks to make room for the absolute trash icon */
+    .chip:hover .chip-inner { max-width: calc(100% - 20px); }
+
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chip-text {
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Trash icon — absolute, slides in from right */
+    .chip-del {
+      position: absolute;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transform: translateX(4px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+
+    .chip:hover .chip-del {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .chip.chip-add {
+      border-style: dashed;
+      color: var(--muted);
+      background: transparent;
+      gap: 6px;
+    }
+
+    .chip.chip-add:hover { color: var(--accent); border-color: var(--accent); background: transparent; }
+
+    .chip.deleting {
+      transition: opacity 0.2s, transform 0.2s;
+      opacity: 0;
+      transform: scale(0.85);
+    }
+
+    /* =====================================================
+       DIVIDER
+       ===================================================== */
+    .divider { height: 1px; background: var(--border); margin: 40px 0; }
+
+    /* =====================================================
+       MAIN LAYOUT — 2 equal columns
+       ===================================================== */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* =====================================================
+       LEFT COLUMN — PROJECT TYPE
+       ===================================================== */
+    .project-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+
+    .project-empty {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 12px 0;
+    }
+
+    .project-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .project-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+      text-align: left;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .project-btn:hover { border-color: var(--muted); background: var(--surface2); }
+
+    .project-btn.selected {
+      background: #3D2F8A;
+      border-color: #4A3A9E;
+      color: #FFFFFF;
+    }
+
+    [data-theme="light"] .project-btn.selected {
+      background: #C026A0;
+      border-color: #C026A0;
+      color: #FFFFFF;
+    }
+
+    .project-btn-label {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .project-btn-arrow {
+      opacity: 0;
+      flex-shrink: 0;
+      margin-left: 8px;
+      transition: opacity 0.2s;
+      color: var(--muted);
+    }
+
+    .project-btn:hover .project-btn-arrow { opacity: 1; }
+    .project-btn.selected .project-btn-arrow { opacity: 1; color: #FFFFFF !important; }
+
+    /* Arc shine pseudo-element */
+    .project-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -80px;
+      width: 80px;
+      background: radial-gradient(ellipse 80px 40px at 50% 50%, rgba(255,255,255,0.09), transparent);
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .project-btn:hover::before {
+      animation: arcShine 0.9s ease forwards;
+      opacity: 1;
+    }
+
+    .project-del {
+      opacity: 0;
+      visibility: hidden;
+      width: 0;
+      color: var(--muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      overflow: hidden;
+      transition: opacity 0.2s, width 0.2s, visibility 0.2s;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+
+    .project-row:hover .project-del {
+      opacity: 1;
+      visibility: visible;
+      width: 24px;
+    }
+
+    .project-del:hover { color: #E07070; }
+
+    /* Reset + Add buttons (left column footer) */
+    .left-col-actions {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .reset-btn {
+      display: none;
+      padding: 11px 16px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--muted);
+      text-align: center;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .reset-btn.visible { display: block; }
+    .reset-btn:hover { color: var(--text); border-color: var(--muted); }
+
+    .project-add-btn {
+      width: 100%;
+      padding: 11px 16px;
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--muted);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .project-add-btn:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); }
+
+    .project-add-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+    /* =====================================================
+       RIGHT COLUMN — RESPONSE
+       ===================================================== */
+    .response-col {
+      min-height: 400px;
+    }
+
+    /* Placeholder: no border, no background, centred pulsing text */
+    .result-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+    }
+
+    .result-placeholder .pulse-text {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* Result panel: appears when project selected */
+    .result-panel {
+      display: none;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 28px;
+      transition: border-color 0.3s;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .result-panel.has-content { border-color: var(--accent2); }
+
+    /* Loading state within result panel */
+    .result-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+    }
+
+    .result-title {
+      font-size: 18px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--accent2);
+      margin-bottom: 12px;
+    }
+
+    .result-body {
+      font-size: 17px;
+      color: var(--result-body-color);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    /* RELEVANT SKILLS label inside result */
+    .relevant-skills-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--accent);
+      margin-bottom: 12px;
+      margin-top: 4px;
+    }
+
+    /* Skill accordion (inside result panel) */
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 6px;
+      overflow: hidden;
+      animation: floatIn 0.35s ease both;
+      transition: border-color 0.3s;
+    }
+
+    .skill-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .skill-card-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .skill-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .skill-level-dots { display: flex; gap: 3px; flex-shrink: 0; }
+
+    .level-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .level-dot.filled { background: var(--accent); }
+
+    .level-label { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+    .skill-chevron {
+      color: var(--muted);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .skill-card.open .skill-chevron { transform: rotate(180deg); }
+
+    .skill-card-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 16px;
+    }
+
+    .skill-card.open .skill-card-body { max-height: 200px; padding: 0 16px 14px; }
+
+    .skill-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+
+    .skill-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+    }
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      margin-top: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-left {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .footer-context-btn {
+      font-size: 12px;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+
+    .footer-context-btn:hover { color: var(--accent); }
+
+    .footer-clear-btn {
+      font-size: 12px;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+
+    .footer-clear-btn:hover { color: #E07070; }
+
+    /* =====================================================
+       MODALS — base (z-index 200)
+       ===================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 12, 16, 0.8);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    /* Warning modal sits above other modals */
+    #modal-warning { z-index: 300; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      width: 480px;
+      max-width: calc(100vw - 40px);
+      position: relative;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 22px;
+      line-height: 1;
+      font-family: inherit;
+      transition: color 0.2s;
+      padding: 4px;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: -14px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .modal-label {
+      font-size: 11px;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .modal-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 16px;
+    }
+
+    .modal-input:focus { border-color: var(--accent2); }
+
+    .modal-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+    .modal-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      cursor: pointer;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .btn-cancel {
+      padding: 10px 20px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .btn-cancel:hover { color: var(--text); }
+
+    .btn-primary {
+      padding: 10px 20px;
+      background: var(--accent);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      color: #080C10;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.5; cursor: default; }
+
+    [data-theme="light"] .btn-primary { color: #FFFFFF; }
+
+    .btn-danger {
+      padding: 10px 20px;
+      background: #E07070;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      color: #fff;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    .btn-danger:hover { opacity: 0.85; }
+
+    /* Project modal status line */
+    .modal-status {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: -10px;
+      margin-bottom: 16px;
+      animation: labelPulse 4s ease-in-out infinite;
+      display: none;
+    }
+
+    /* =====================================================
+       CONTEXT MODAL
+       ===================================================== */
+    .context-modal {
+      width: 760px;
+      max-width: calc(100vw - 40px);
+      max-height: 85vh;
+      overflow-y: auto;
+      border-radius: 18px;
+      padding: 0;
+    }
+
+    .context-modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 1;
+    }
+
+    .context-modal-body { padding: 24px 32px; }
+
+    .context-modal-footer {
+      padding: 20px 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      position: sticky;
+      bottom: 0;
+      background: var(--surface);
+    }
+
+
+    /* =====================================================
+       TOOLTIP
+       ===================================================== */
+    #skill-tooltip {
+      position: fixed;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      pointer-events: none;
+      z-index: 1000;
+      max-width: 240px;
+      display: none;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .tt-level {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+    }
+
+    .tt-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* =====================================================
+       ANIMATIONS
+       ===================================================== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes labelPulse {
+      0%, 100% { opacity: 0.4; }
+      50%       { opacity: 0.9; }
+    }
+
+    @keyframes arcShine {
+      from { left: -80px; }
+      to   { left: 110%; }
+    }
+
+    @keyframes arrowBounce {
+      0%   { transform: translateX(0); }
+      40%  { transform: translateX(4px); }
+      70%  { transform: translateX(1px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      body { padding: 32px 16px; }
+      .main-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background grain -->
+<div class="bg-grain">
+  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain)"/>
+  </svg>
+</div>
+
+<!-- Background blobs (rendered by JS) -->
+<div class="bg-blobs" id="bg-blobs"></div>
+
+<div class="container">
+
+  <!-- API Key Banner -->
+  <div class="api-key-banner" id="api-key-banner" style="display:none">
+    <span class="api-key-label">Anthropic API Key</span>
+    <input type="password" class="api-key-input" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+    <button class="api-key-save" onclick="saveApiKey()">Save</button>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div>
+      <div class="page-title">Capability Overview</div>
+    </div>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+      <svg class="toggle-icon" id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      <svg class="toggle-icon" id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- Setup Banner (visible when no skills) -->
+  <div class="setup-banner" id="setup-banner" style="display:none">
+    <div class="setup-banner-title">Getting Started</div>
+    <div class="setup-steps">
+      <div class="setup-step">
+        <div class="step-badge">1</div>
+        <div class="step-text">Click <strong>Context</strong> in the footer to describe your working style, known gaps, and principles. This shapes all AI output.</div>
+      </div>
+      <div class="setup-step">
+        <div class="step-badge">2</div>
+        <div class="step-text">Click <strong>+ Add skill</strong> below to define your capabilities — each needs a name, description, and expertise level.</div>
+      </div>
+      <div class="setup-step">
+        <div class="step-badge">3</div>
+        <div class="step-text">Add <strong>project types</strong> on the left. The AI will match them to your skills and describe how you'd contribute.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro Section -->
+  <div class="intro-section" id="intro-section" style="display:none">
+    <div class="intro-paragraph" id="intro-paragraph">
+      <span class="pulse-text">Generating introduction…</span>
+    </div>
+  </div>
+
+  <!-- Chips Section -->
+  <div class="chips-section">
+    <div class="section-label">Skills</div>
+    <div class="chips-row" id="chips-row"></div>
+    <div class="chips-empty" id="chips-empty" style="display:none">No skills added yet.</div>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider"></div>
+
+  <!-- Main 2-col layout -->
+  <div class="main-layout">
+
+    <!-- LEFT: Project Type -->
+    <div>
+      <div class="section-label">Project Type</div>
+      <div class="project-grid" id="project-grid"></div>
+      <div class="project-empty" id="project-empty" style="display:none">No project types yet. Add one below.</div>
+      <div class="left-col-actions">
+        <button class="reset-btn" id="reset-btn" onclick="resetSelection()">Clear selection</button>
+        <button class="project-add-btn" id="project-add-btn" onclick="openAddProjectModal()">+ Add project type</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Response -->
+    <div class="response-col">
+      <!-- Placeholder — no border, no background -->
+      <div class="result-placeholder" id="result-placeholder">
+        <span class="pulse-text">Select a project type</span>
+      </div>
+      <!-- Result panel — appears when project selected -->
+      <div class="result-panel" id="result-panel">
+        <div id="result-inner"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-left">2025</div>
+    <div style="display:flex;gap:20px;align-items:center">
+      <button class="footer-clear-btn" onclick="promptClearData()">Clear data</button>
+      <button class="footer-clear-btn" id="footer-forget-key" onclick="forgetApiKey()" style="display:none">Remove API key</button>
+      <button class="footer-context-btn" onclick="openContextModal()">Context</button>
+    </div>
+  </footer>
+
+</div>
+
+<!-- Tooltip -->
+<div id="skill-tooltip">
+  <div class="tt-level" id="tt-level"></div>
+  <div class="tt-desc" id="tt-desc"></div>
+</div>
+
+<!-- =====================================================
+     ADD / EDIT SKILL MODAL
+     ===================================================== -->
+<div class="modal-overlay" id="modal-skill">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-skill')">×</button>
+    <div class="modal-title" id="skill-modal-title">Add a skill</div>
+    <label class="modal-label">Skill name</label>
+    <input type="text" class="modal-input" id="skill-name" placeholder="e.g. Service design">
+    <label class="modal-label">Description</label>
+    <textarea class="modal-input modal-textarea" id="skill-desc" placeholder="What you can actually do with this skill…"></textarea>
+    <label class="modal-label">Expertise level</label>
+    <select class="modal-input modal-select" id="skill-level">
+      <option value="Expert">Expert</option>
+      <option value="Proficient" selected>Proficient</option>
+      <option value="Foundational">Foundational</option>
+    </select>
+    <label class="modal-label">Category tag (optional)</label>
+    <input type="text" class="modal-input" id="skill-tag" placeholder="e.g. Core Capability">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-skill')">Cancel</button>
+      <button class="btn-primary" id="skill-save-btn" onclick="saveSkill()">Add skill</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     ADD PROJECT MODAL
+     ===================================================== -->
+<div class="modal-overlay" id="modal-project">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-project')">×</button>
+    <div class="modal-title">Add project type</div>
+    <div class="modal-subtitle">Describe a scenario in plain language. The AI will generate a title, description, and match your skills to it.</div>
+    <label class="modal-label">Scenario description</label>
+    <textarea class="modal-input modal-textarea" id="project-scenario" placeholder="e.g. Discovery research for a B2B SaaS product with complex stakeholder dynamics…" style="min-height:100px"></textarea>
+    <div class="modal-status" id="project-status">Generating…</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-project')">Cancel</button>
+      <button class="btn-primary" id="project-save-btn" onclick="submitAddProject()">Generate project</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     CONFIRM DELETE MODAL
+     ===================================================== -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-confirm')">×</button>
+    <div class="modal-title" id="confirm-title">Delete?</div>
+    <div class="modal-subtitle" id="confirm-subtitle">This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-confirm')">Cancel</button>
+      <button class="btn-danger" id="confirm-action-btn">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     WARNING MODAL (z-index 300 — on top of other modals)
+     ===================================================== -->
+<div class="modal-overlay" id="modal-warning">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-warning')">×</button>
+    <div class="modal-title">Heads up</div>
+    <div class="modal-subtitle" id="warning-reason">The AI flagged this addition.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-warning')">Cancel</button>
+      <button class="btn-primary" id="warning-proceed-btn">Add anyway</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     CONTEXT MODAL
+     ===================================================== -->
+<div class="modal-overlay" id="modal-context">
+  <div class="modal context-modal">
+    <div class="context-modal-header">
+      <div>
+        <div class="modal-title" style="margin-bottom:4px">Additional Context</div>
+        <div style="font-size:13px;color:var(--muted)">Shapes every AI response.</div>
+      </div>
+      <button class="modal-close" style="position:relative;top:auto;right:auto;margin-left:16px" onclick="closeModal('modal-context')">×</button>
+    </div>
+    <div class="context-modal-body">
+      <textarea class="modal-input modal-textarea" id="ctx-notes" placeholder="Working style, gaps, constraints, how the AI should handle them — write freely…" style="min-height:320px;resize:vertical"></textarea>
+    </div>
+    <div class="context-modal-footer">
+      <button class="btn-cancel" onclick="closeModal('modal-context')">Cancel</button>
+      <button class="btn-primary" onclick="saveContext()">Save context</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =========================================================
+// DATA MODELS
+// =========================================================
+let skillDefs = {};
+
+let projectData = {};
+
+let contextData = { text: '' };
+let currentProject = null;
+let _introGenId = 0;
+let _editingSkillId = null;
+let _pendingSkillData = null;
+let _pendingProjectScenario = null;
+let _apiKey = localStorage.getItem('cap_api_key') || '';
+
+// =========================================================
+// LOCAL STORAGE — PERSISTENCE
+// =========================================================
+function saveData() {
+  localStorage.setItem('cap_skills',   JSON.stringify(skillDefs));
+  localStorage.setItem('cap_projects', JSON.stringify(projectData));
+  localStorage.setItem('cap_context',  JSON.stringify(contextData));
+}
+
+function loadData() {
+  try {
+    const s = localStorage.getItem('cap_skills');
+    const p = localStorage.getItem('cap_projects');
+    const c = localStorage.getItem('cap_context');
+    if (s) skillDefs   = JSON.parse(s);
+    if (p) projectData = JSON.parse(p);
+    if (c) {
+      const parsed = JSON.parse(c);
+      // migrate old structured format to free-text
+      if (typeof parsed.text === 'string') {
+        contextData = parsed;
+      } else {
+        let migrated = '';
+        if (parsed.workingStyle) migrated += parsed.workingStyle;
+        if (parsed.generalPrinciple) migrated += (migrated ? '\n\n' : '') + parsed.generalPrinciple;
+        contextData = { text: migrated };
+      }
+    }
+  } catch(e) {
+    console.warn('Could not load saved data:', e);
+  }
+}
+
+function promptClearData() {
+  document.getElementById('confirm-title').textContent = 'Clear all data?';
+  document.getElementById('confirm-subtitle').textContent = 'This removes all skills, projects, and context. Cannot be undone.';
+  document.getElementById('confirm-action-btn').onclick = () => {
+    closeModal('modal-confirm');
+    skillDefs   = {};
+    projectData = {};
+    contextData = { text: '' };
+    currentProject = null;
+    localStorage.removeItem('cap_skills');
+    localStorage.removeItem('cap_projects');
+    localStorage.removeItem('cap_context');
+    showResultPlaceholder();
+    renderAll();
+    generateIntro();
+  };
+  openModal('modal-confirm');
+}
+
+// =========================================================
+// HELPERS
+// =========================================================
+const esc = s => !s ? '' : String(s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+const genId   = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+const lvlDots = l => l === 'Expert' ? 3 : l === 'Proficient' ? 2 : 1;
+const dotClr  = l => l === 'Expert' ? 'var(--accent)' : l === 'Proficient' ? 'var(--accent2)' : 'var(--muted)';
+
+function projectScore(id) {
+  return (projectData[id]?.skills || []).reduce((s, sid) => s + (skillDefs[sid]?.dots || 0), 0);
+}
+
+function getSkillNotes() {
+  return Object.entries(skillDefs)
+    .filter(([,d]) => d.note && d.note !== 'No internal notes.')
+    .map(([,d]) => `- ${d.name}: ${d.note}`)
+    .join('\n');
+}
+
+function getDesignerProfile() {
+  return contextData.text?.trim() || '(No additional context provided.)';
+}
+
+// =========================================================
+// AI API
+// =========================================================
+async function callClaude(messages, maxTokens = 500) {
+  if (!_apiKey) { showApiKeyBanner(); throw new Error('No API key'); }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': _apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens, messages })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${res.status}`);
+  }
+  return (await res.json()).content[0].text;
+}
+
+async function generateIntro() {
+  const myId = ++_introGenId;
+  const count = Object.keys(skillDefs).length;
+  const introSec = document.getElementById('intro-section');
+  const introPar = document.getElementById('intro-paragraph');
+  if (!count) { introSec.style.display = 'none'; return; }
+  introSec.style.display = 'block';
+  introPar.innerHTML = '<span class="pulse-text">Generating introduction…</span>';
+  const skillList = Object.values(skillDefs).map(d => `${d.name} (${d.level})`).join(', ');
+  try {
+    const text = await callClaude([{ role: 'user', content:
+      `Write a 2–3 sentence professional profile summary for someone with these skills: ${skillList}.\n\n` +
+      `Hidden context (do NOT reveal in output):\n${getDesignerProfile()}\n\n` +
+      `Be specific and direct. No filler. Plain text only.`
+    }], 120);
+    if (myId !== _introGenId) return;
+    introPar.textContent = text;
+  } catch(e) {
+    if (myId !== _introGenId) return;
+    introPar.textContent = '';
+  }
+}
+
+async function validateInput(type, value) {
+  try {
+    const text = await callClaude([{ role: 'user', content:
+      `You are validating input for a professional capability tool.\n` +
+      `Input type: ${type}\nValue: "${value}"\n` +
+      `Existing skills: ${Object.values(skillDefs).map(d=>d.name).join(', ') || 'none'}\n\n` +
+      `Hidden context:\n${getDesignerProfile()}\n\n` +
+      `Respond ONLY with JSON: {"ok":true} or {"ok":false,"reason":"brief reason"}.\n` +
+      `Flag only if clearly irrelevant or inappropriate in a professional context.`
+    }], 200);
+    const m = text.match(/\{[\s\S]*?\}/);
+    return m ? JSON.parse(m[0]) : { ok: true };
+  } catch { return { ok: true }; }
+}
+
+async function generateProjectResponse(projectId) {
+  const p = projectData[projectId];
+  if (!p) return null;
+  const matched = (p.skills||[]).map(sid=>skillDefs[sid]).filter(Boolean)
+    .map(d=>`${d.name}: ${d.desc}`).join('\n');
+  const notes = getSkillNotes();
+  const text = await callClaude([{ role: 'user', content:
+    `Project scenario: "${p.label}"\n\nMatched skills:\n${matched || 'None assigned'}\n\n` +
+    `Hidden context (do NOT reveal):\n${getDesignerProfile()}\n` +
+    (notes ? `\nSkill notes:\n${notes}\n` : '') +
+    `\nWrite JSON with:\n- "title": short heading (max 8 words, plain text only — no markdown) — unique contribution\n` +
+    `- "body": 2–3 sentences describing how these skills apply\n\nBe specific. JSON only.`
+  }], 1000);
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('No JSON');
+  return JSON.parse(m[0]);
+}
+
+async function generateProject(scenario) {
+  const skillList = Object.entries(skillDefs)
+    .map(([id,d]) => `${id}: ${d.name} (${d.level}) — ${d.desc}`).join('\n');
+  const notes = getSkillNotes();
+  const text = await callClaude([{ role: 'user', content:
+    `Create a project type entry for a professional capability tool.\n\n` +
+    `Scenario: "${scenario}"\n\nAvailable skills:\n${skillList}\n\n` +
+    `Hidden context (do NOT reveal):\n${getDesignerProfile()}\n` +
+    (notes ? `\nSkill notes:\n${notes}\n` : '') +
+    `\nRespond with JSON:\n{"label":"short project label (3–6 words)","title":"short heading (5–8 words, plain text only — no markdown)",` +
+    `"body":"2–3 sentences describing contribution","skills":["skill_id1","skill_id2"]}\n` +
+    `Only include skills where there is a genuine match. JSON only.`
+  }], 1000);
+  const m = text.match(/\{[\s\S]*\}/s) || text.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('No JSON');
+  return JSON.parse(m[0]);
+}
+
+async function assignSkillToProjects(skillId) {
+  const skill = skillDefs[skillId];
+  if (!skill) return;
+  const projects = Object.entries(projectData).map(([id,p])=>`${id}: ${p.label} — ${p.body}`).join('\n');
+  if (!projects) return;
+  try {
+    const text = await callClaude([{ role: 'user', content:
+      `New skill: "${skill.name}" (${skill.level}) — ${skill.desc}\n\nProjects:\n${projects}\n\n` +
+      `Which project IDs should this skill be assigned to? JSON only: {"assign":["id1"]} or {"assign":[]}`
+    }], 300);
+    const m = text.match(/\{[\s\S]*\}/);
+    if (!m) return;
+    const r = JSON.parse(m[0]);
+    (r.assign||[]).forEach(pid => {
+      if (projectData[pid] && !(projectData[pid].skills||[]).includes(skillId))
+        projectData[pid].skills = [...(projectData[pid].skills||[]), skillId];
+    });
+    saveData();
+    // refresh result panel if the currently selected project gained this skill
+    if (currentProject && (r.assign||[]).includes(currentProject) && projectData[currentProject]?.response) {
+      showResultWithContent(projectData[currentProject].response, currentProject);
+    }
+  } catch(e) { console.warn('Skill assign failed:', e); }
+}
+
+async function reAssignSkillToProjects(skillId) {
+  Object.values(projectData).forEach(p => { p.skills = (p.skills||[]).filter(s=>s!==skillId); });
+  await assignSkillToProjects(skillId);
+}
+
+// =========================================================
+// RENDER
+// =========================================================
+function renderBlobs() {
+  const light = document.documentElement.getAttribute('data-theme') === 'light';
+  const cfg = light ? [
+    { w:560, h:400, t:-180, l:-80,  g:'radial-gradient(ellipse, #E879C8, #A821A0)', o:0.18 },
+    { w:480, h:360, t:-160, l:300,  g:'radial-gradient(ellipse, #A78BFA, #6D28D9)', o:0.15 },
+    { w:420, h:320, t:-140, l:600,  g:'radial-gradient(ellipse, #F472B6, #BE185D)', o:0.14 },
+    { w:380, h:300, t:-120, l:850,  g:'radial-gradient(ellipse, #C084FC, #7E22CE)', o:0.12 },
+  ] : [
+    { w:560, h:400, t:-180, l:-80,  g:'radial-gradient(ellipse, #1DB87A, #0A6644)', o:0.45 },
+    { w:480, h:360, t:-160, l:300,  g:'radial-gradient(ellipse, #1AA8C8, #0A5A72)', o:0.42 },
+    { w:420, h:320, t:-140, l:600,  g:'radial-gradient(ellipse, #6B4FD8, #3A1F90)', o:0.38 },
+    { w:380, h:300, t:-120, l:850,  g:'radial-gradient(ellipse, #3B8FE8, #1A4A9A)', o:0.32 },
+  ];
+  document.getElementById('bg-blobs').innerHTML = cfg.map(b =>
+    `<div class="blob" style="width:${b.w}px;height:${b.h}px;top:${b.t}px;left:${b.l}px;background:${b.g};opacity:${b.o}"></div>`
+  ).join('');
+}
+
+function renderChips() {
+  const row   = document.getElementById('chips-row');
+  const empty = document.getElementById('chips-empty');
+  const ids   = Object.keys(skillDefs);
+  empty.style.display = ids.length ? 'none' : 'block';
+
+  const chips = ids.map(id => {
+    const s = skillDefs[id];
+    return `
+      <div class="chip"
+        onclick="openEditSkillModal('${id}')"
+        onmouseenter="showTooltip(event,'${id}')"
+        onmouseleave="hideTooltip()"
+        data-chip="${id}">
+        <div class="chip-inner">
+          <div class="chip-dot" style="background:${dotClr(s.level)}"></div>
+          <span class="chip-text">${esc(s.name)}</span>
+        </div>
+        <div class="chip-del" onclick="event.stopPropagation();confirmDelete('skill','${id}')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/>
+          </svg>
+        </div>
+      </div>`;
+  }).join('');
+
+  row.innerHTML = chips + `
+    <button class="chip chip-add" onclick="openAddSkillModal()">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/>
+      </svg>
+      Add skill
+    </button>`;
+}
+
+function renderProjects() {
+  const grid     = document.getElementById('project-grid');
+  const emptyEl  = document.getElementById('project-empty');
+  const addBtn   = document.getElementById('project-add-btn');
+  const resetBtn = document.getElementById('reset-btn');
+
+  addBtn.disabled = !Object.keys(skillDefs).length;
+  resetBtn.classList.toggle('visible', currentProject !== null);
+
+  const sorted = Object.keys(projectData).sort((a,b) => projectScore(b) - projectScore(a));
+  emptyEl.style.display = sorted.length ? 'none' : 'block';
+
+  grid.innerHTML = sorted.map(id => {
+    const p = projectData[id];
+    return `
+      <div class="project-row">
+        <button class="project-btn ${id===currentProject?'selected':''}"
+          onclick="selectProject('${id}')" data-proj="${id}">
+          <span class="project-btn-label">${esc(p.label)}</span>
+          <svg class="project-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
+          </svg>
+        </button>
+        <button class="project-del" onclick="confirmDelete('project','${id}')" title="Remove">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/>
+          </svg>
+        </button>
+      </div>`;
+  }).join('');
+
+  // Arrow bounce on hover
+  grid.querySelectorAll('.project-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      const arrow = btn.querySelector('.project-btn-arrow');
+      if (arrow) { arrow.style.animation = 'none'; void arrow.offsetWidth; arrow.style.animation = 'arrowBounce 0.5s ease'; }
+    });
+  });
+}
+
+function renderEmptyStates() {
+  const has = Object.keys(skillDefs).length > 0;
+  document.getElementById('setup-banner').style.display  = has ? 'none' : 'block';
+  document.getElementById('intro-section').style.display = has ? 'block' : 'none';
+}
+
+// Render skill accordion cards inside the result panel
+function renderResultAccordion(projectId) {
+  const p       = projectData[projectId];
+  const matched = (p?.skills || []).map(sid => ({ id: sid, skill: skillDefs[sid] })).filter(d => d.skill);
+  const inner   = document.getElementById('result-inner');
+  const panel   = document.getElementById('result-panel');
+
+  // Build result content HTML
+  const skillsHtml = matched.map(({ id: sid, skill: s }, i) => {
+    const dots = [1,2,3].map(n => `<div class="level-dot ${n<=s.dots?'filled':''}"></div>`).join('');
+    return `
+      <div class="skill-card" style="animation-delay:${i*0.08}s" data-acc="res-${sid}">
+        <div class="skill-card-header" onclick="toggleAccordion('res-${sid}')">
+          <div class="skill-card-left">
+            <span class="skill-name">${esc(s.name)}</span>
+            <div class="skill-level-dots">${dots}</div>
+            <span class="level-label">${s.level}</span>
+          </div>
+          <svg class="skill-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6,9 12,15 18,9"/>
+          </svg>
+        </div>
+        <div class="skill-card-body">
+          <div class="skill-desc">${esc(s.desc)}</div>
+          ${s.tag ? `<div class="skill-tag">${esc(s.tag)}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  // Preserve title/body if already set; otherwise use project defaults
+  const storedTitle = inner.dataset.title || p?.title || '';
+  const storedBody  = inner.dataset.body  || p?.body  || '';
+
+  inner.innerHTML = `
+    <div class="result-title">${esc(storedTitle)}</div>
+    <div class="result-body">${esc(storedBody)}</div>
+    ${matched.length ? `<div class="relevant-skills-label">Relevant Skills</div>${skillsHtml}` : ''}`;
+
+  panel.classList.add('has-content');
+}
+
+function showResultWithContent(data, projectId) {
+  const placeholder = document.getElementById('result-placeholder');
+  const panel       = document.getElementById('result-panel');
+  const inner       = document.getElementById('result-inner');
+
+  const p       = projectData[projectId];
+  const matched = (p?.skills || []).map(sid => ({ id: sid, skill: skillDefs[sid] })).filter(d => d.skill);
+
+  const skillsHtml = matched.map(({ id: sid, skill: s }, i) => {
+    const dots = [1,2,3].map(n => `<div class="level-dot ${n<=s.dots?'filled':''}"></div>`).join('');
+    return `
+      <div class="skill-card" style="animation-delay:${i*0.08}s" data-acc="res-${sid}">
+        <div class="skill-card-header" onclick="toggleAccordion('res-${sid}')">
+          <div class="skill-card-left">
+            <span class="skill-name">${esc(s.name)}</span>
+            <div class="skill-level-dots">${dots}</div>
+            <span class="level-label">${s.level}</span>
+          </div>
+          <svg class="skill-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6,9 12,15 18,9"/>
+          </svg>
+        </div>
+        <div class="skill-card-body">
+          <div class="skill-desc">${esc(s.desc)}</div>
+          ${s.tag ? `<div class="skill-tag">${esc(s.tag)}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  placeholder.style.display = 'none';
+  panel.style.display = 'block';
+  panel.classList.add('has-content');
+  inner.innerHTML = `
+    <div class="result-title">${esc(data.title || p?.title || '')}</div>
+    <div class="result-body">${esc(data.body || p?.body || '')}</div>
+    ${matched.length ? `<div class="relevant-skills-label">Relevant Skills</div>${skillsHtml}` : ''}`;
+}
+
+function showResultLoading() {
+  const placeholder = document.getElementById('result-placeholder');
+  const panel       = document.getElementById('result-panel');
+  const inner       = document.getElementById('result-inner');
+  placeholder.style.display = 'none';
+  panel.style.display = 'block';
+  panel.classList.remove('has-content');
+  inner.innerHTML = `<div class="result-loading"><span class="pulse-text">Generating response…</span></div>`;
+}
+
+function showResultPlaceholder() {
+  const placeholder = document.getElementById('result-placeholder');
+  const panel       = document.getElementById('result-panel');
+  panel.style.display = 'none';
+  panel.classList.remove('has-content');
+  placeholder.style.display = 'flex';
+}
+
+function renderAll() {
+  renderBlobs();
+  renderEmptyStates();
+  renderChips();
+  renderProjects();
+  // If a project is selected, re-render its result accordion (skills may have changed)
+  if (currentProject && document.getElementById('result-panel').style.display !== 'none') {
+    renderResultAccordion(currentProject);
+  }
+}
+
+// =========================================================
+// INTERACTIONS
+// =========================================================
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  isLight
+    ? document.documentElement.removeAttribute('data-theme')
+    : document.documentElement.setAttribute('data-theme', 'light');
+  syncThemeIcons();
+  renderBlobs();
+}
+
+function syncThemeIcons() {
+  const light = document.documentElement.getAttribute('data-theme') === 'light';
+  document.getElementById('icon-moon').classList.toggle('active', !light);
+  document.getElementById('icon-sun').classList.toggle('active', light);
+}
+
+function toggleAccordion(id) {
+  // Each card manages its own state independently
+  document.querySelector(`[data-acc="${id}"]`)?.classList.toggle('open');
+}
+
+async function selectProject(id) {
+  if (id === currentProject) return; // noop on same-project click
+  currentProject = id;
+  renderProjects();
+
+  const p = projectData[id];
+  if (p?.response) {
+    showResultWithContent(p.response, id);
+    return;
+  }
+
+  showResultLoading();
+  try {
+    const data = await generateProjectResponse(id);
+    if (currentProject === id) {
+      projectData[id].response = data;
+      saveData();
+      showResultWithContent(data, id);
+    }
+  } catch(e) {
+    if (currentProject === id) {
+      const inner = document.getElementById('result-inner');
+      const panel = document.getElementById('result-panel');
+      panel.classList.remove('has-content');
+      inner.innerHTML = `<div class="result-loading"><span class="pulse-text">${
+        _apiKey ? 'Could not generate response — try again.' : 'Add your API key above to generate responses.'
+      }</span></div>`;
+    }
+  }
+}
+
+function resetSelection() {
+  currentProject = null;
+  renderProjects();
+  showResultPlaceholder();
+}
+
+// Tooltip
+function showTooltip(e, id) {
+  const s = skillDefs[id]; if (!s) return;
+  const tt   = document.getElementById('skill-tooltip');
+  const lvl  = document.getElementById('tt-level');
+  const desc = document.getElementById('tt-desc');
+  lvl.textContent = s.level; lvl.style.color = dotClr(s.level);
+  desc.textContent = s.desc;
+  tt.style.display = 'block';
+  const rect = e.currentTarget.getBoundingClientRect();
+  let x = rect.left, y = rect.bottom + 8;
+  const tw = 240, th = tt.offsetHeight || 80;
+  if (x + tw > window.innerWidth - 12) x = window.innerWidth - tw - 12;
+  if (y + th > window.innerHeight - 12) y = rect.top - th - 8;
+  if (x < 8) x = 8;
+  tt.style.left = x + 'px'; tt.style.top = y + 'px';
+}
+function hideTooltip() { document.getElementById('skill-tooltip').style.display = 'none'; }
+
+// =========================================================
+// MODALS
+// =========================================================
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// --- Skill modal ---
+function openAddSkillModal() {
+  _editingSkillId = null;
+  document.getElementById('skill-modal-title').textContent = 'Add a skill';
+  document.getElementById('skill-save-btn').textContent = 'Add skill';
+  document.getElementById('skill-save-btn').disabled = false;
+  document.getElementById('skill-name').value = '';
+  document.getElementById('skill-desc').value = '';
+  document.getElementById('skill-level').value = 'Proficient';
+  document.getElementById('skill-tag').value = '';
+  openModal('modal-skill');
+}
+
+function openEditSkillModal(id) {
+  const s = skillDefs[id]; if (!s) return;
+  _editingSkillId = id;
+  document.getElementById('skill-modal-title').textContent = 'Edit skill';
+  document.getElementById('skill-save-btn').textContent = 'Save changes';
+  document.getElementById('skill-save-btn').disabled = false;
+  document.getElementById('skill-name').value = s.name;
+  document.getElementById('skill-desc').value = s.desc;
+  document.getElementById('skill-level').value = s.level;
+  document.getElementById('skill-tag').value = s.tag || '';
+  openModal('modal-skill');
+}
+
+async function saveSkill() {
+  const name  = document.getElementById('skill-name').value.trim();
+  const desc  = document.getElementById('skill-desc').value.trim();
+  const level = document.getElementById('skill-level').value;
+  const tag   = document.getElementById('skill-tag').value.trim();
+  if (!name) return;
+  const duplicate = Object.entries(skillDefs).find(([id, s]) =>
+    s.name.toLowerCase() === name.toLowerCase() && id !== _editingSkillId
+  );
+  if (duplicate) {
+    const nameInput = document.getElementById('skill-name');
+    nameInput.setCustomValidity('A skill with this name already exists.');
+    nameInput.reportValidity();
+    nameInput.setCustomValidity('');
+    nameInput.style.borderColor = 'var(--accent2)';
+    setTimeout(() => nameInput.style.borderColor = '', 1500);
+    return;
+  }
+  const data = { name, desc, level, dots: lvlDots(level), tag };
+
+  if (_editingSkillId) {
+    // Edit — no validation needed, close and commit
+    skillDefs[_editingSkillId] = { ...skillDefs[_editingSkillId], ...data };
+    saveData();
+    closeModal('modal-skill');
+    renderAll();
+    generateIntro();
+    reAssignSkillToProjects(_editingSkillId);
+    return;
+  }
+
+  // Add — validate first. Skill modal stays open during validation.
+  const btn = document.getElementById('skill-save-btn');
+  btn.textContent = 'Checking…'; btn.disabled = true;
+  const v = await validateInput('skill', `${name}: ${desc}`).catch(() => ({ ok: true }));
+  btn.textContent = 'Add skill'; btn.disabled = false;
+
+  if (!v.ok) {
+    // Warning opens ON TOP — skill modal stays open with fields preserved
+    _pendingSkillData = data;
+    document.getElementById('warning-reason').textContent = v.reason || 'This skill may not be appropriate.';
+    document.getElementById('warning-proceed-btn').onclick = () => {
+      closeModal('modal-warning');
+      closeModal('modal-skill');
+      commitAddSkill(_pendingSkillData);
+    };
+    openModal('modal-warning');
+    return;
+  }
+
+  closeModal('modal-skill');
+  commitAddSkill(data);
+}
+
+function commitAddSkill(data) {
+  const id = genId('s');
+  skillDefs[id] = data;
+  saveData();
+  renderAll();
+  generateIntro();
+  assignSkillToProjects(id);
+}
+
+// --- Project modal ---
+function openAddProjectModal() {
+  document.getElementById('project-scenario').value = '';
+  document.getElementById('project-save-btn').textContent = 'Generate project';
+  document.getElementById('project-save-btn').disabled = false;
+  document.getElementById('project-status').style.display = 'none';
+  document.getElementById('project-status').textContent = '';
+  openModal('modal-project');
+}
+
+async function submitAddProject() {
+  const scenario = document.getElementById('project-scenario').value.trim();
+  if (!scenario) return;
+
+  const btn    = document.getElementById('project-save-btn');
+  const status = document.getElementById('project-status');
+
+  // Validation phase
+  btn.textContent = 'Checking…'; btn.disabled = true;
+  const v = await validateInput('project type', scenario).catch(() => ({ ok: true }));
+
+  if (!v.ok) {
+    // Reset button, open warning ON TOP — project modal stays open
+    btn.textContent = 'Generate project'; btn.disabled = false;
+    _pendingProjectScenario = scenario;
+    document.getElementById('warning-reason').textContent = v.reason || 'This project type may not be appropriate.';
+    document.getElementById('warning-proceed-btn').onclick = () => {
+      closeModal('modal-warning');
+      // Proceed with generation from project modal
+      runProjectGeneration(scenario);
+    };
+    openModal('modal-warning');
+    return;
+  }
+
+  await runProjectGeneration(scenario);
+}
+
+async function runProjectGeneration(scenario) {
+  const btn    = document.getElementById('project-save-btn');
+  const status = document.getElementById('project-status');
+  btn.textContent = 'Generating…'; btn.disabled = true;
+  status.textContent = 'Generating…'; status.style.display = 'block';
+  try {
+    await commitGenerateProject(scenario);
+    closeModal('modal-project');
+  } catch(e) {
+    btn.textContent = 'Error — try again'; btn.disabled = false;
+    status.textContent = 'Something went wrong.';
+  }
+}
+
+async function commitGenerateProject(scenario) {
+  const data = await generateProject(scenario);
+  const id = genId('p');
+  projectData[id] = {
+    label: data.label || scenario.slice(0,40),
+    title: data.title || '',
+    body:  data.body  || '',
+    skills: (data.skills||[]).filter(sid => skillDefs[sid])
+  };
+  saveData();
+  renderProjects();
+}
+
+// --- Confirm delete ---
+function confirmDelete(type, id) {
+  const name = type === 'skill' ? skillDefs[id]?.name : projectData[id]?.label;
+  document.getElementById('confirm-title').textContent = `Delete "${name}"?`;
+  document.getElementById('confirm-subtitle').textContent = 'This cannot be undone.';
+  document.getElementById('confirm-action-btn').onclick = () => {
+    closeModal('modal-confirm');
+    type === 'skill' ? doDeleteSkill(id) : doDeleteProject(id);
+  };
+  openModal('modal-confirm');
+}
+
+function doDeleteSkill(id) {
+  // Remove from all project skill lists
+  Object.values(projectData).forEach(p => { p.skills = (p.skills||[]).filter(s=>s!==id); });
+  // Animate chip out
+  const chip = document.querySelector(`[data-chip="${id}"]`);
+  if (chip) {
+    chip.classList.add('deleting');
+    setTimeout(() => { delete skillDefs[id]; saveData(); renderAll(); generateIntro(); }, 200);
+  } else {
+    delete skillDefs[id]; saveData(); renderAll(); generateIntro();
+  }
+}
+
+function doDeleteProject(id) {
+  // If deleting the current project, reset selection first
+  if (id === currentProject) resetSelection();
+  delete projectData[id];
+  saveData();
+  renderProjects();
+}
+
+// --- Context modal ---
+function openContextModal() {
+  document.getElementById('ctx-notes').value = contextData.text || '';
+  openModal('modal-context');
+}
+
+function saveContext() {
+  contextData.text = document.getElementById('ctx-notes').value.trim();
+  saveData();
+  closeModal('modal-context');
+  generateIntro();
+}
+
+// =========================================================
+// API KEY
+// =========================================================
+function showApiKeyBanner() {
+  document.getElementById('api-key-banner').style.display = 'flex';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) return;
+  _apiKey = key;
+  localStorage.setItem('cap_api_key', key);
+  document.getElementById('api-key-banner').style.display = 'none';
+  document.getElementById('footer-forget-key').style.display = 'inline';
+  generateIntro();
+}
+
+function forgetApiKey() {
+  _apiKey = '';
+  localStorage.removeItem('cap_api_key');
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('footer-forget-key').style.display = 'none';
+  showApiKeyBanner();
+}
+
+// =========================================================
+// GLOBAL EVENT HANDLERS
+// =========================================================
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ESC closes topmost open modal
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  // Close warning first if open (it sits on top)
+  if (document.getElementById('modal-warning').classList.contains('open')) {
+    closeModal('modal-warning'); return;
+  }
+  document.querySelectorAll('.modal-overlay.open').forEach(o => o.classList.remove('open'));
+});
+
+// =========================================================
+// INIT
+// =========================================================
+function init() {
+  loadData();
+  syncThemeIcons();
+  renderAll();
+  if (!_apiKey) {
+    showApiKeyBanner();
+  } else {
+    document.getElementById('footer-forget-key').style.display = 'inline';
+    generateIntro();
+  }
+}
+
+init();
+</script>
+</body>
+</html>

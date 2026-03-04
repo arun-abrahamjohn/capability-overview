@@ -1,5 +1,7 @@
 # Capability Overview
 
+**Live demo:** https://arun-abrahamjohn.github.io/capability-overview
+
 A single-page interactive tool for presenting your professional skills and exploring project fit — in real time, with whoever you're talking to.
 
 ---
